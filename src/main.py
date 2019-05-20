@@ -6,6 +6,7 @@ import node2vec
 import warnings
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 from gensim.models import Word2Vec
+from gensim.models import KeyedVectors
 
 
 def parse_args():
@@ -65,6 +66,8 @@ def learn_embeddings(walks):
 	Learn embeddings by optimizing the Skipgram objective using SGD.
 	'''
 	walks = [list(map(str, walk)) for walk in walks]
+	for i in walks:
+		print(i)
 	model = Word2Vec(walks, size=args.dimensions, window=args.window_size, min_count=0, sg=1, seed=1, workers=1, iter=args.iter)
 	model.wv.save_word2vec_format(args.output)
 	
@@ -84,6 +87,16 @@ def main(args):
 
 if __name__ == "__main__":
 	args = parse_args()
-	args.input = '../graph/karate.edgelist'
-	args.output = '../emb/karate.emb'
+	args.input = 'user_edges'
+	args.output = 'user_vec'
+	args.walk_length = 5
+	args.num_walks = 10
+	# args.weighted = True
+	# args.directed = True
+	args.dimensions = 64
+	args.window_size = 2
+	args.p = 2
+	args.q = 2
 	main(args)
+	model = KeyedVectors.load_word2vec_format('user_vec')
+	print(model.wv.most_similar('4'))
